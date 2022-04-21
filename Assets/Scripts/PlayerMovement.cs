@@ -11,20 +11,19 @@ public class PlayerMovement : MonoBehaviour
     [Header("Move")]
     public bool leftShiftInput;
     public Vector2 moveInput;
-    public float moveAmount;
+    public float acceleration = 0.05f;
+    public float deceleration = 0.1f;
     public float curSpeed;
-    public float walkSpeed = 20f;
-    public float runSpeed = 30f;
+    public float targetSpeed;
+    public float walkSpeed = 5f;
+    public float runSpeed = 10f;
     public float rotateSpeed = 5f;
+    public Vector3 velocity;
     
     [Header("Jump")]
     public Rigidbody playerRigidbody;
     public float jumpForce = 7f;
-    public float jumpForwardMultiplier = 0.7f;
-
-    public Vector3 forwardForce;
     public Vector3 upForce;
-    public Vector3 force;
 
     [Header("Ground Detection")]
     public bool isGrounded;
@@ -74,18 +73,24 @@ public class PlayerMovement : MonoBehaviour
         
         if (isGrounded || isOnSlop)
         {
-            // 获取移动量
-            moveAmount = moveInput.magnitude;
-            if (moveAmount != 0)
+            if (moveInput.magnitude != 0)
             {
-                // 根据 WASD 输入旋转角色
                 RotatePlayer();
-                // 向前角色正前方移动角色
-                MovePlayer();
+                MovePlayerForward();
+            }
+            else
+            {
+                if (curSpeed > 0)
+                {
+                    curSpeed -= deceleration * Time.fixedDeltaTime;
+                    curSpeed = Mathf.Clamp(curSpeed, 0, float.MaxValue);   
+                }
             }
 
             Jump();
         }
+
+        velocity = playerRigidbody.velocity;
     }
     
     
@@ -164,26 +169,33 @@ public class PlayerMovement : MonoBehaviour
         _transform.rotation = rotation;
     }
 
-    private void MovePlayer()
+    private void MovePlayerForward()
     {
-        // 使角色向自己的正前方移动
-        curSpeed = leftShiftInput ? runSpeed : walkSpeed;
-        playerRigidbody.velocity = _transform.forward * moveAmount * curSpeed;
-        // _transform.position += _transform.forward * moveAmount * curSpeed * Time.deltaTime;
-        // playerRigidbody.AddForce(_transform.forward * moveAmount * curSpeed, ForceMode.Acceleration);
+        targetSpeed = leftShiftInput ? runSpeed : walkSpeed;
+        if (curSpeed < targetSpeed)
+        {
+            curSpeed += acceleration * Time.fixedDeltaTime;
+            curSpeed = Mathf.Clamp(curSpeed, 0, targetSpeed);
+        }
+        else if (curSpeed > targetSpeed)
+        {
+            curSpeed -= deceleration * Time.fixedDeltaTime;
+            curSpeed = Mathf.Clamp(curSpeed, targetSpeed, float.MaxValue);
+        }
+
+        playerRigidbody.velocity = _transform.forward * curSpeed 
+                                   + new Vector3(0f, playerRigidbody.velocity.y, 0f);
     }
 
     private void Jump()
     {
         if (_playerControls.Locomotion.Jump.triggered)
         {
-            var oldVelocity = playerRigidbody.velocity;
-            playerRigidbody.velocity = new Vector3(oldVelocity.x, 0f, oldVelocity.z);
+            var curVelocity = playerRigidbody.velocity;
+            playerRigidbody.velocity = new Vector3(curVelocity.x, 0f, curVelocity.z);
             
-            forwardForce = _transform.forward * moveAmount * curSpeed * jumpForwardMultiplier;
             upForce = _transform.up * jumpForce;
-            force = upForce + forwardForce;
-            playerRigidbody.AddForce(force, ForceMode.Impulse);
+            playerRigidbody.AddForce(upForce, ForceMode.Impulse);
             isGrounded = false;
         }
     }
@@ -198,9 +210,9 @@ public class PlayerMovement : MonoBehaviour
         var playerBottom = _transform.position - new Vector3(0, playerHeight / 2, 0);
         return Physics.CheckSphere(playerBottom, groundDistance, groundMask);
         // Note:
-        // 记得在编辑器中新增一个 Layer: GroundLayer
-        // 将 groundMask 设置为 GroundLayer
-        // 将需要视为地面的物体的 Layer 都设置为 GroundLayer
+        // 1.记得在编辑器中新增一个 Layer: GroundLayer
+        // 2.将 groundMask 设置为 GroundLayer
+        // 3.将需要视为地面的物体的 Layer 都设置为 GroundLayer
     }
 
     private bool CheckIsOnSlop()
