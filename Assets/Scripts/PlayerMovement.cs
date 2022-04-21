@@ -39,8 +39,12 @@ public class PlayerMovement : MonoBehaviour
     [Header("Animation")]
     public Animator animator;
     public string speedParamString;
-    
+    public string jumpParamString;
+    public string isGroundedParamString;
+
     private int _speedParamHash;
+    private int _jumpParamHash;
+    private int _isGroundedParamHash;
 
     private Transform _transform;
     private Transform _mainCameraTransform;
@@ -65,6 +69,8 @@ public class PlayerMovement : MonoBehaviour
         _transform = transform;
         _mainCameraTransform = Camera.main.transform;
         _speedParamHash = Animator.StringToHash(speedParamString);
+        _jumpParamHash = Animator.StringToHash(jumpParamString);
+        _isGroundedParamHash = Animator.StringToHash(isGroundedParamString);
     }
 
     private void OnEnable()
@@ -86,6 +92,8 @@ public class PlayerMovement : MonoBehaviour
         {
             playerRigidbody.drag = landDrag;
             
+            animator.SetBool(_isGroundedParamHash, true);
+            
             if (moveInput.magnitude != 0)
             {
                 RotatePlayer();
@@ -106,6 +114,7 @@ public class PlayerMovement : MonoBehaviour
         else
         {
             playerRigidbody.drag = airDrag;
+            animator.SetBool(_isGroundedParamHash, false);
         }
 
         velocity = playerRigidbody.velocity;
@@ -219,6 +228,9 @@ public class PlayerMovement : MonoBehaviour
             
             upForce = _transform.up * jumpForce;
             playerRigidbody.AddForce(upForce, ForceMode.Impulse);
+            
+            animator.SetTrigger(_jumpParamHash);
+            animator.SetBool(_isGroundedParamHash, false);
         }
     }
 
