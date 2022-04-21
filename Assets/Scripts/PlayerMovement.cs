@@ -25,6 +25,10 @@ public class PlayerMovement : MonoBehaviour
     public float jumpForce = 7f;
     public Vector3 upForce;
 
+    [Header("Drag")]
+    public float landDrag = 1f;
+    public float airDrag = 0f;
+
     [Header("Ground Detection")]
     public bool isGrounded;
     public bool isOnSlop;
@@ -73,6 +77,8 @@ public class PlayerMovement : MonoBehaviour
         
         if (isGrounded || isOnSlop)
         {
+            playerRigidbody.drag = landDrag;
+            
             if (moveInput.magnitude != 0)
             {
                 RotatePlayer();
@@ -86,8 +92,12 @@ public class PlayerMovement : MonoBehaviour
                     curSpeed = Mathf.Clamp(curSpeed, 0, float.MaxValue);   
                 }
             }
-
+            
             Jump();
+        }
+        else
+        {
+            playerRigidbody.drag = airDrag;
         }
 
         velocity = playerRigidbody.velocity;
@@ -191,12 +201,14 @@ public class PlayerMovement : MonoBehaviour
     {
         if (_playerControls.Locomotion.Jump.triggered)
         {
+            isGrounded = false;
+            playerRigidbody.drag = airDrag;
+
             var curVelocity = playerRigidbody.velocity;
             playerRigidbody.velocity = new Vector3(curVelocity.x, 0f, curVelocity.z);
             
             upForce = _transform.up * jumpForce;
             playerRigidbody.AddForce(upForce, ForceMode.Impulse);
-            isGrounded = false;
         }
     }
 
