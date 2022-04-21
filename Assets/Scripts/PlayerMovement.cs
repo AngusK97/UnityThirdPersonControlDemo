@@ -36,6 +36,12 @@ public class PlayerMovement : MonoBehaviour
     public float groundDistance = 0.4f;
     public LayerMask groundMask;
 
+    [Header("Animation")]
+    public Animator animator;
+    public string speedParamString;
+    
+    private int _speedParamHash;
+
     private Transform _transform;
     private Transform _mainCameraTransform;
     private PlayerControls _playerControls;
@@ -58,6 +64,7 @@ public class PlayerMovement : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         _transform = transform;
         _mainCameraTransform = Camera.main.transform;
+        _speedParamHash = Animator.StringToHash(speedParamString);
     }
 
     private void OnEnable()
@@ -89,7 +96,8 @@ public class PlayerMovement : MonoBehaviour
                 if (curSpeed > 0)
                 {
                     curSpeed -= deceleration * Time.fixedDeltaTime;
-                    curSpeed = Mathf.Clamp(curSpeed, 0, float.MaxValue);   
+                    curSpeed = Mathf.Clamp(curSpeed, 0, float.MaxValue);
+                    animator.SetFloat(_speedParamHash, curSpeed);
                 }
             }
             
@@ -182,6 +190,7 @@ public class PlayerMovement : MonoBehaviour
     private void MovePlayerForward()
     {
         targetSpeed = leftShiftInput ? runSpeed : walkSpeed;
+        
         if (curSpeed < targetSpeed)
         {
             curSpeed += acceleration * Time.fixedDeltaTime;
@@ -192,7 +201,8 @@ public class PlayerMovement : MonoBehaviour
             curSpeed -= deceleration * Time.fixedDeltaTime;
             curSpeed = Mathf.Clamp(curSpeed, targetSpeed, float.MaxValue);
         }
-
+        
+        animator.SetFloat(_speedParamHash, curSpeed);
         playerRigidbody.velocity = _transform.forward * curSpeed 
                                    + new Vector3(0f, playerRigidbody.velocity.y, 0f);
     }
