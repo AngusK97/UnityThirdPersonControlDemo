@@ -595,7 +595,7 @@ MonoBehaviour:
   bodyTargetDirection: {x: 0, y: 0, z: 0}
   leftShiftInput: 0
   moveInput: {x: 0, y: 0}
-  acceleration: 5
+  acceleration: 12
   deceleration: 12
   curSpeed: 0
   targetSpeed: 0
