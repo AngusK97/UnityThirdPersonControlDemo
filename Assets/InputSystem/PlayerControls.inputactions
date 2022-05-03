@@ -136,6 +136,33 @@
                     "isPartOfComposite": false
                 }
             ]
+        },
+        {
+            "name": "Attack",
+            "id": "5d19f6dc-bc3a-40be-a829-0de34938cf71",
+            "actions": [
+                {
+                    "name": "LightAttack",
+                    "type": "PassThrough",
+                    "id": "1cb10030-d3b3-4506-b237-78f2a604d847",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "21c12f6e-9f7d-4fd7-a6c8-c59278917749",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "LightAttack",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": []

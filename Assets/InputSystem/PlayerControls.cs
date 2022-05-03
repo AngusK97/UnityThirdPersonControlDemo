@@ -149,6 +149,33 @@ public class @PlayerControls : IInputActionCollection, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""Attack"",
+            ""id"": ""5d19f6dc-bc3a-40be-a829-0de34938cf71"",
+            ""actions"": [
+                {
+                    ""name"": ""LightAttack"",
+                    ""type"": ""PassThrough"",
+                    ""id"": ""1cb10030-d3b3-4506-b237-78f2a604d847"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""21c12f6e-9f7d-4fd7-a6c8-c59278917749"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""LightAttack"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": []
@@ -161,6 +188,9 @@ public class @PlayerControls : IInputActionCollection, IDisposable
         // Camera
         m_Camera = asset.FindActionMap("Camera", throwIfNotFound: true);
         m_Camera_MouseLook = m_Camera.FindAction("MouseLook", throwIfNotFound: true);
+        // Attack
+        m_Attack = asset.FindActionMap("Attack", throwIfNotFound: true);
+        m_Attack_LightAttack = m_Attack.FindAction("LightAttack", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -288,6 +318,39 @@ public class @PlayerControls : IInputActionCollection, IDisposable
         }
     }
     public CameraActions @Camera => new CameraActions(this);
+
+    // Attack
+    private readonly InputActionMap m_Attack;
+    private IAttackActions m_AttackActionsCallbackInterface;
+    private readonly InputAction m_Attack_LightAttack;
+    public struct AttackActions
+    {
+        private @PlayerControls m_Wrapper;
+        public AttackActions(@PlayerControls wrapper) { m_Wrapper = wrapper; }
+        public InputAction @LightAttack => m_Wrapper.m_Attack_LightAttack;
+        public InputActionMap Get() { return m_Wrapper.m_Attack; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(AttackActions set) { return set.Get(); }
+        public void SetCallbacks(IAttackActions instance)
+        {
+            if (m_Wrapper.m_AttackActionsCallbackInterface != null)
+            {
+                @LightAttack.started -= m_Wrapper.m_AttackActionsCallbackInterface.OnLightAttack;
+                @LightAttack.performed -= m_Wrapper.m_AttackActionsCallbackInterface.OnLightAttack;
+                @LightAttack.canceled -= m_Wrapper.m_AttackActionsCallbackInterface.OnLightAttack;
+            }
+            m_Wrapper.m_AttackActionsCallbackInterface = instance;
+            if (instance != null)
+            {
+                @LightAttack.started += instance.OnLightAttack;
+                @LightAttack.performed += instance.OnLightAttack;
+                @LightAttack.canceled += instance.OnLightAttack;
+            }
+        }
+    }
+    public AttackActions @Attack => new AttackActions(this);
     public interface ILocomotionActions
     {
         void OnMovement(InputAction.CallbackContext context);
@@ -297,5 +360,9 @@ public class @PlayerControls : IInputActionCollection, IDisposable
     public interface ICameraActions
     {
         void OnMouseLook(InputAction.CallbackContext context);
+    }
+    public interface IAttackActions
+    {
+        void OnLightAttack(InputAction.CallbackContext context);
     }
 }
