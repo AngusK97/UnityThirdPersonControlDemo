@@ -253,7 +253,6 @@ public class PlayerMovement : MonoBehaviour
         var newQuaternionRotation = Quaternion.Euler(newEulerRotation);
         rotation = Quaternion.Slerp(rotation, newQuaternionRotation, Time.deltaTime * rotateSpeed);
         _transform.rotation = rotation;
-        Debug.LogError("hello");
     }
 
     private void MoveAttackingPlayerForward()
