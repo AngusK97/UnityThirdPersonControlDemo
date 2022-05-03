@@ -47,13 +47,15 @@ public class PlayerMovement : MonoBehaviour
     public Transform lookPoint;
     public float lookPointDistance = 5f;
 
+    [Header("Player Input")]
+    public InputManager inputManager; 
+
     private int _speedParamHash;
     private int _jumpParamHash;
     private int _isGroundedParamHash;
 
     private Transform _transform;
     private Transform _mainCameraTransform;
-    private PlayerControls _playerControls;
 
 
     //-----------------------------------------------------------------------------------------------
@@ -62,10 +64,9 @@ public class PlayerMovement : MonoBehaviour
 
     private void Awake()
     {
-        _playerControls = new PlayerControls();
-        _playerControls.Locomotion.Movement.performed += ReadMovementInput;
-        _playerControls.Locomotion.LeftShift.started += SetLeftShiftPressed;
-        _playerControls.Locomotion.LeftShift.canceled += SetLeftShiftUnpressed;
+        inputManager.playerControls.Locomotion.Movement.performed += ReadMovementInput;
+        inputManager.playerControls.Locomotion.LeftShift.started += SetLeftShiftPressed;
+        inputManager.playerControls.Locomotion.LeftShift.canceled += SetLeftShiftUnpressed;
     }
 
     void Start()
@@ -76,16 +77,6 @@ public class PlayerMovement : MonoBehaviour
         _speedParamHash = Animator.StringToHash(speedParamString);
         _jumpParamHash = Animator.StringToHash(jumpParamString);
         _isGroundedParamHash = Animator.StringToHash(isGroundedParamString);
-    }
-
-    private void OnEnable()
-    {
-        _playerControls.Enable();
-    }
-
-    private void OnDisable()
-    {
-        _playerControls.Disable();
     }
 
     void FixedUpdate()
@@ -225,7 +216,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void Jump()
     {
-        if (_playerControls.Locomotion.Jump.triggered)
+        if (inputManager.playerControls.Locomotion.Jump.triggered)
         {
             isGrounded = false;
             playerRigidbody.drag = airDrag;
