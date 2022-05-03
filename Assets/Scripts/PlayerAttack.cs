@@ -53,8 +53,13 @@ public class PlayerAttack : MonoBehaviour
         _canDoCombo = false;
     }
 
-    private void ResetDoCombo()
+    private void SetNotDoCombo()
     {
         animator.SetBool(_doComboParamHash, false);
+    }
+
+    private void SetIsNotAttacking()
+    {
+        animator.SetBool("isAttacking", false);
     }
 }

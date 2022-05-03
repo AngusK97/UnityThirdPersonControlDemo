@@ -36,23 +36,26 @@ public class PlayerMovement : MonoBehaviour
     public float groundDistance = 0.4f;
     public LayerMask groundMask;
 
-    [Header("Animation")]
-    public Animator animator;
-    public string speedParamString;
-    public string jumpParamString;
-    public string isGroundedParamString;
-
     [Header("Head Movement")]
     public Transform head;
     public Transform lookPoint;
     public float lookPointDistance = 5f;
 
     [Header("Player Input")]
-    public InputManager inputManager; 
+    public InputManager inputManager;
 
+    [Header("Animation")]
+    public Animator animator;
+    public string speedParamString;
+    public string jumpParamString;
+    public string isGroundedParamString;
+    public string isAttackingParamString;
+    
     private int _speedParamHash;
     private int _jumpParamHash;
     private int _isGroundedParamHash;
+    private int _isAttackingParamHash;
+    private bool _isAttacking;
 
     private Transform _transform;
     private Transform _mainCameraTransform;
@@ -77,6 +80,7 @@ public class PlayerMovement : MonoBehaviour
         _speedParamHash = Animator.StringToHash(speedParamString);
         _jumpParamHash = Animator.StringToHash(jumpParamString);
         _isGroundedParamHash = Animator.StringToHash(isGroundedParamString);
+        _isAttackingParamHash = Animator.StringToHash(isAttackingParamString);
     }
 
     void FixedUpdate()
@@ -97,21 +101,31 @@ public class PlayerMovement : MonoBehaviour
             
             animator.SetBool(_isGroundedParamHash, true);
             
-            if (moveInput.magnitude != 0)
+            _isAttacking = animator.GetBool(_isAttackingParamHash);
+
+            if (!_isAttacking)
             {
-                RotatePlayerBody();
-                MovePlayerForward();
+                if (moveInput.magnitude != 0)
+                {
+                    RotatePlayerBody();
+                    MovePlayerForward();
+                }
+                else
+                {
+                    if (curSpeed > 0)
+                    {
+                        curSpeed -= deceleration * Time.fixedDeltaTime;
+                        curSpeed = Mathf.Clamp(curSpeed, 0, float.MaxValue);
+                        animator.SetFloat(_speedParamHash, curSpeed);
+                    }
+                }
             }
             else
             {
-                if (curSpeed > 0)
-                {
-                    curSpeed -= deceleration * Time.fixedDeltaTime;
-                    curSpeed = Mathf.Clamp(curSpeed, 0, float.MaxValue);
-                    animator.SetFloat(_speedParamHash, curSpeed);
-                }
+                RotateAttackingPlayerBody();
+                MoveAttackingPlayerForward();
             }
-            
+
             Jump();
         }
         else
@@ -197,6 +211,54 @@ public class PlayerMovement : MonoBehaviour
     private void MovePlayerForward()
     {
         targetSpeed = leftShiftInput ? runSpeed : walkSpeed;
+        
+        if (curSpeed < targetSpeed)
+        {
+            curSpeed += acceleration * Time.fixedDeltaTime;
+            curSpeed = Mathf.Clamp(curSpeed, 0, targetSpeed);
+        }
+        else if (curSpeed > targetSpeed)
+        {
+            curSpeed -= deceleration * Time.fixedDeltaTime;
+            curSpeed = Mathf.Clamp(curSpeed, targetSpeed, float.MaxValue);
+        }
+        
+        animator.SetFloat(_speedParamHash, curSpeed);
+        playerRigidbody.velocity = _transform.forward * curSpeed 
+                                   + new Vector3(0f, playerRigidbody.velocity.y, 0f);
+    }
+    
+    private void RotateAttackingPlayerBody()
+    {
+        // 计算角色朝向
+        bodyTargetDirection = cameraStraightForward;
+        bodyTargetDirection.Normalize();
+        
+        // 计算目标方向与角色前方方向的夹角度数
+        var playerForward = _transform.forward;
+        var desiredRotationAngle = Vector3.Angle(playerForward, bodyTargetDirection);
+
+        // 使用叉乘，查看相机水平方向在角色当前正前方方向的左边还是右边
+        // Unity 遵循左手螺旋定则，如果结果为正，说明相机方向在角色方向右边，使用正角度值进行旋转
+        // 如果结果为负，说明相机方向在角色方向左边，使用负角度值进行旋转
+        var crossProduct = Vector3.Cross(playerForward, bodyTargetDirection).y;
+        if (crossProduct < 0)
+        {
+            desiredRotationAngle *= -1;
+        }
+        
+        // 旋转角色
+        var rotation = _transform.rotation;
+        var newEulerRotation = rotation.eulerAngles + new Vector3(0, desiredRotationAngle);
+        var newQuaternionRotation = Quaternion.Euler(newEulerRotation);
+        rotation = Quaternion.Slerp(rotation, newQuaternionRotation, Time.deltaTime * rotateSpeed);
+        _transform.rotation = rotation;
+        Debug.LogError("hello");
+    }
+
+    private void MoveAttackingPlayerForward()
+    {
+        targetSpeed = 2f;
         
         if (curSpeed < targetSpeed)
         {

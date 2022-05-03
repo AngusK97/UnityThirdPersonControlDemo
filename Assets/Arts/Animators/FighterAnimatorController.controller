@@ -137,7 +137,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 7400000, guid: da496c792700841f0a3a93baf0ea45cd, type: 2}
+  m_Motion: {fileID: 7400000, guid: 242dbc38fb9724db78c9dc74dc5e84c9, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -182,9 +182,9 @@ AnimatorStateTransition:
   m_Mute: 0
   m_IsExit: 0
   serializedVersion: 3
-  m_TransitionDuration: 0.25
+  m_TransitionDuration: 0.49905652
   m_TransitionOffset: 0
-  m_ExitTime: 0.8897059
+  m_ExitTime: 0.88970584
   m_HasExitTime: 1
   m_HasFixedDuration: 1
   m_InterruptionSource: 0
@@ -226,7 +226,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: One Hand Sword Combo 02
-  m_Speed: 1.6
+  m_Speed: 1.5
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: -952049466751257932}
@@ -313,6 +313,18 @@ BlendTree:
   m_UseAutomaticThresholds: 1
   m_NormalizedBlendValues: 0
   m_BlendType: 0
+--- !u!114 &-1425825625989660604
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ac9bad930c6d9420aa77bf236f8a174d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1102 &-1224759186385684814
 AnimatorState:
   serializedVersion: 5
@@ -321,12 +333,13 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: One Hand Sword Combo 01
-  m_Speed: 2
+  m_Speed: 1.7
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: 8368751072594799663}
   - {fileID: -1102118306074794579}
-  m_StateMachineBehaviours: []
+  m_StateMachineBehaviours:
+  - {fileID: -1425825625989660604}
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
   m_WriteDefaultValues: 1
@@ -358,7 +371,7 @@ AnimatorStateTransition:
   m_Mute: 0
   m_IsExit: 0
   serializedVersion: 3
-  m_TransitionDuration: 0.25
+  m_TransitionDuration: 0.83310837
   m_TransitionOffset: 0
   m_ExitTime: 0.81707317
   m_HasExitTime: 1
@@ -430,7 +443,8 @@ AnimatorState:
   - {fileID: -6380019122652364837}
   - {fileID: 5809199960494751931}
   - {fileID: -7226374241276338000}
-  m_StateMachineBehaviours: []
+  m_StateMachineBehaviours:
+  - {fileID: 1038869536649745098}
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
   m_WriteDefaultValues: 1
@@ -531,6 +545,12 @@ AnimatorController:
     m_DefaultInt: 0
     m_DefaultBool: 0
     m_Controller: {fileID: 0}
+  - m_Name: isAttacking
+    m_Type: 4
+    m_DefaultFloat: 0
+    m_DefaultInt: 0
+    m_DefaultBool: 0
+    m_Controller: {fileID: 0}
   m_AnimatorLayers:
   - serializedVersion: 5
     m_Name: Base Layer
@@ -620,6 +640,18 @@ AnimatorState:
   m_MirrorParameter: 
   m_CycleOffsetParameter: 
   m_TimeParameter: 
+--- !u!114 &1038869536649745098
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b85e36016717a42ddbd56365e9cb0def, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1102 &1348596954546693368
 AnimatorState:
   serializedVersion: 5
@@ -853,7 +885,7 @@ AnimatorStateTransition:
   m_Mute: 0
   m_IsExit: 0
   serializedVersion: 3
-  m_TransitionDuration: 0.25
+  m_TransitionDuration: 0.76590264
   m_TransitionOffset: 0
   m_ExitTime: 0.7222223
   m_HasExitTime: 1
