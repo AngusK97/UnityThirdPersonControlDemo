@@ -32,7 +32,7 @@ public class @PlayerControls : IInputActionCollection, IDisposable
                     ""id"": ""f903cc2a-dea6-4919-ae4e-649e4fbb061c"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
-                    ""interactions"": ""Hold""
+                    ""interactions"": """"
                 },
                 {
                     ""name"": ""Jump"",

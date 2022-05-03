@@ -6,7 +6,7 @@ public class PlayerMovement : MonoBehaviour
     [Header("Direction Calculation")]
     public Vector3 cameraStraightForward;
     public Vector3 cameraStraightRight;
-    public Vector3 directionToLook;
+    public Vector3 bodyTargetDirection;
     
     [Header("Move")]
     public bool leftShiftInput;
@@ -41,6 +41,11 @@ public class PlayerMovement : MonoBehaviour
     public string speedParamString;
     public string jumpParamString;
     public string isGroundedParamString;
+
+    [Header("Head Movement")]
+    public Transform head;
+    public Transform lookPoint;
+    public float lookPointDistance = 5f;
 
     private int _speedParamHash;
     private int _jumpParamHash;
@@ -85,6 +90,13 @@ public class PlayerMovement : MonoBehaviour
 
     void FixedUpdate()
     {
+        // 计算相机水平正前方向、水平正右方向
+        cameraStraightForward = Vector3.Scale(_mainCameraTransform.forward, new Vector3(1, 0, 1));
+        cameraStraightRight = Vector3.Scale(_mainCameraTransform.right, new Vector3(1, 0, 1));
+        var position = _mainCameraTransform.position;
+        Debug.DrawRay(position, cameraStraightRight * 10, Color.red);
+        Debug.DrawRay(position, cameraStraightForward * 10, Color.blue);
+
         isGrounded = CheckIsGrounded();
         isOnSlop = CheckIsOnSlop();
         
@@ -96,7 +108,7 @@ public class PlayerMovement : MonoBehaviour
             
             if (moveInput.magnitude != 0)
             {
-                RotatePlayer();
+                RotatePlayerBody();
                 MovePlayerForward();
             }
             else
@@ -116,6 +128,8 @@ public class PlayerMovement : MonoBehaviour
             playerRigidbody.drag = airDrag;
             animator.SetBool(_isGroundedParamHash, false);
         }
+        
+        UpdateLookPointPosition();
 
         velocity = playerRigidbody.velocity;
     }
@@ -145,44 +159,37 @@ public class PlayerMovement : MonoBehaviour
     // Locomotion
     //-----------------------------------------------------------------------------------------------
     
-    private void RotatePlayer()
+    private void RotatePlayerBody()
     {
-        // 计算相机水平正前方向、水平正右方向
-        cameraStraightForward = Vector3.Scale(_mainCameraTransform.forward, new Vector3(1, 0, 1));
-        cameraStraightRight = Vector3.Scale(_mainCameraTransform.right, new Vector3(1, 0, 1));
-        var position = _mainCameraTransform.position;
-        Debug.DrawRay(position, cameraStraightRight * 10, Color.red);
-        Debug.DrawRay(position, cameraStraightForward * 10, Color.blue);
-
         // 计算角色朝向
-        directionToLook = Vector3.zero;
+        bodyTargetDirection = Vector3.zero;
         if (moveInput.y > 0)
         {
-            directionToLook += cameraStraightForward;
+            bodyTargetDirection += cameraStraightForward;
         }
         else if (moveInput.y < 0)
         {
-            directionToLook += -cameraStraightForward;
+            bodyTargetDirection += -cameraStraightForward;
         }
         
         if (moveInput.x > 0)
         {
-            directionToLook += cameraStraightRight;
+            bodyTargetDirection += cameraStraightRight;
         }
         else if (moveInput.x < 0)
         {
-            directionToLook += -cameraStraightRight;
+            bodyTargetDirection += -cameraStraightRight;
         }
-        directionToLook.Normalize();
+        bodyTargetDirection.Normalize();
         
         // 计算目标方向与角色前方方向的夹角度数
         var playerForward = _transform.forward;
-        var desiredRotationAngle = Vector3.Angle(playerForward, directionToLook);
+        var desiredRotationAngle = Vector3.Angle(playerForward, bodyTargetDirection);
 
         // 使用叉乘，查看相机水平方向在角色当前正前方方向的左边还是右边
         // Unity 遵循左手螺旋定则，如果结果为正，说明相机方向在角色方向右边，使用正角度值进行旋转
         // 如果结果为负，说明相机方向在角色方向左边，使用负角度值进行旋转
-        var crossProduct = Vector3.Cross(playerForward, directionToLook).y;
+        var crossProduct = Vector3.Cross(playerForward, bodyTargetDirection).y;
         if (crossProduct < 0)
         {
             desiredRotationAngle *= -1;
@@ -260,5 +267,36 @@ public class PlayerMovement : MonoBehaviour
             }
         }
         return false;
+    }
+    
+    
+    //-----------------------------------------------------------------------------------------------
+    // Head Movement
+    //-----------------------------------------------------------------------------------------------
+
+    private void OnAnimatorIK(int layerIndex)
+    {
+        animator.SetLookAtWeight(1, 0, 1, 0, 0.50f);
+        animator.SetLookAtPosition(lookPoint.position);
+    }
+    
+    private void UpdateLookPointPosition()
+    {
+        // 判断视角与角色前方的同向、反向关系，并根据同/反方向确认观察点的最终位置
+        var directionValue = Vector3.Dot(head.position - _mainCameraTransform.position, _transform.forward);
+        Vector3 finalPointPosition;
+        if (directionValue < 0)
+        {
+            finalPointPosition = _transform.forward * lookPointDistance + head.position;
+        }
+        else
+        {
+            finalPointPosition = cameraStraightForward * lookPointDistance + head.position;
+        }
+        
+        // 插值得到观察点的新位置
+        var curPointPosition = lookPoint.position;
+        var nextPointPosition = Vector3.Slerp(curPointPosition, finalPointPosition, 0.05f);
+        lookPoint.position = nextPointPosition;
     }
 }
