@@ -5074,6 +5074,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Fighter
       objectReference: {fileID: 0}
+    - target: {fileID: 5531848017826213726, guid: dfcebfe0b4162437d969b8b198b4a596,
+        type: 3}
+      propertyPath: m_Mass
+      value: 1.35
+      objectReference: {fileID: 0}
+    - target: {fileID: 5531848017826213728, guid: dfcebfe0b4162437d969b8b198b4a596,
+        type: 3}
+      propertyPath: walkSpeed
+      value: 3.5
+      objectReference: {fileID: 0}
     - target: {fileID: 5531848017826213728, guid: dfcebfe0b4162437d969b8b198b4a596,
         type: 3}
       propertyPath: inputManager
