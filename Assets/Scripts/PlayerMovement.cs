@@ -65,13 +65,6 @@ public class PlayerMovement : MonoBehaviour
     // Lifecycle
     //-----------------------------------------------------------------------------------------------
 
-    private void Awake()
-    {
-        inputManager.playerControls.Locomotion.Movement.performed += ReadMovementInput;
-        inputManager.playerControls.Locomotion.LeftShift.started += SetLeftShiftPressed;
-        inputManager.playerControls.Locomotion.LeftShift.canceled += SetLeftShiftUnpressed;
-    }
-
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
@@ -81,6 +74,10 @@ public class PlayerMovement : MonoBehaviour
         _jumpParamHash = Animator.StringToHash(jumpParamString);
         _isGroundedParamHash = Animator.StringToHash(isGroundedParamString);
         _isAttackingParamHash = Animator.StringToHash(isAttackingParamString);
+        
+        inputManager.playerControls.Locomotion.Movement.performed += ReadMovementInput;
+        inputManager.playerControls.Locomotion.LeftShift.started += SetLeftShiftPressed;
+        inputManager.playerControls.Locomotion.LeftShift.canceled += SetLeftShiftUnpressed;
     }
 
     void FixedUpdate()
