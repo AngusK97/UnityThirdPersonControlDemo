@@ -2,8 +2,10 @@
 A third person control demo inspired by the Witcher 3. 
 From a third person perspective, player can control a character in the scene to walk, run, jump, do combo attack, move on slop, and fall.
 
-This demo is implemented by Angus Kung to practice Rigidbody, IK, Input System, Cinemachine and Animator in Unity. 
-For the next version, scripts will be refactored into a clearer and more flexible sturcture.
+This demo is implemented by Angus Kung to practice Rigidbody, IK, Input System, Cinemachine and Animator in Unity.
+
+For the next version, scripts will be refactored into a clearer and more flexible sturcture. 
+In the future, this project will not only be about third person control and may add more features, including enemy AI, dialog system, better game scene.
 
 
 # Control Method
