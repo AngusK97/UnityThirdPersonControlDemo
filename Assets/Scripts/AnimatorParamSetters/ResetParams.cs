@@ -9,6 +9,7 @@ public class ResetParams : StateMachineBehaviour
     override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         animator.SetBool("isAttacking", false);
+        animator.SetBool("doAttackCombo", false);
     }
 
     // OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks

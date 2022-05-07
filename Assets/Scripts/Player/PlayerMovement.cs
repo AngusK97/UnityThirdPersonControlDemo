@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
@@ -135,8 +136,13 @@ public class PlayerMovement : MonoBehaviour
 
         velocity = playerRigidbody.velocity;
     }
-    
-    
+
+    private void LateUpdate()
+    {
+        animator.ResetTrigger(_jumpParamHash);
+    }
+
+
     //-----------------------------------------------------------------------------------------------
     // Read Input System Data
     //-----------------------------------------------------------------------------------------------

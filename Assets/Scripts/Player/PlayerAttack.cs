@@ -22,11 +22,9 @@ public class PlayerAttack : MonoBehaviour
     {
         if (inputManager.playerControls.Attack.LightAttack.triggered)
         {
-            if (!_canDoCombo)
-            {
-                animator.SetTrigger(_attackParamHash);
-            }
-            else
+            
+            animator.SetTrigger(_attackParamHash);
+            if (_canDoCombo)
             {
                 animator.SetBool(_doComboParamHash, true);
             }
