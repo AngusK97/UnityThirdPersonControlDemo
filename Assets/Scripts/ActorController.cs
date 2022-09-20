@@ -10,15 +10,13 @@ public class ActorController : MonoBehaviour
     public Vector3 bodyTargetDirection;
     
     [Header("Move")]
-    public bool leftShiftInput;
-    public Vector2 moveInput;
-    public float acceleration = 0.05f;
-    public float deceleration = 0.1f;
-    public float curSpeed;
-    public float targetSpeed;
     public float walkSpeed = 5f;
     public float runSpeed = 10f;
     public float rotateSpeed = 5f;
+    public float acceleration = 0.05f;
+    public float deceleration = 0.1f;
+    public float targetSpeed;
+    public float curSpeed;
     public Vector3 velocity;
     
     [Header("Jump")]
@@ -43,7 +41,7 @@ public class ActorController : MonoBehaviour
     public float lookPointDistance = 5f;
 
     [Header("Player Input")]
-    public InputManager inputManager;
+    public PlayerInput pi;
 
     [Header("Animation")]
     public Animator animator;
@@ -75,10 +73,6 @@ public class ActorController : MonoBehaviour
         _jumpParamHash = Animator.StringToHash(jumpParam);
         _isGroundedParamHash = Animator.StringToHash(isOnGroundedParam);
         _attackParamHash = Animator.StringToHash(attackParam);
-        
-        inputManager.playerControls.Locomotion.Movement.performed += ReadMovementInput;
-        inputManager.playerControls.Locomotion.LeftShift.started += SetLeftShiftPressed;
-        inputManager.playerControls.Locomotion.LeftShift.canceled += SetLeftShiftUnpressed;
     }
 
     void FixedUpdate()
@@ -93,7 +87,7 @@ public class ActorController : MonoBehaviour
         isOnGround = CheckIsGrounded();
         isOnSlop = CheckIsOnSlop();
         
-        if (inputManager.playerControls.Attack.LightAttack.triggered && isOnGround)
+        if (pi.attack && isOnGround)
             animator.SetTrigger(_attackParamHash);
         
         if (isOnGround || isOnSlop)
@@ -104,7 +98,7 @@ public class ActorController : MonoBehaviour
             
             if (!_isAttacking)
             {
-                if (moveInput.magnitude != 0)
+                if (pi.moveVec.magnitude != 0)
                 {
                     RotatePlayerBody();
                     MovePlayerForward();
@@ -140,26 +134,6 @@ public class ActorController : MonoBehaviour
 
 
     //-----------------------------------------------------------------------------------------------
-    // Read Input System Data
-    //-----------------------------------------------------------------------------------------------
-
-    private void ReadMovementInput(InputAction.CallbackContext ctx)
-    {
-        moveInput = ctx.ReadValue<Vector2>();
-    }
-
-    private void SetLeftShiftPressed(InputAction.CallbackContext ctx)
-    {
-        leftShiftInput = true;
-    }
-
-    private void SetLeftShiftUnpressed(InputAction.CallbackContext ctx)
-    {
-        leftShiftInput = false;
-    }
-
-
-    //-----------------------------------------------------------------------------------------------
     // Locomotion
     //-----------------------------------------------------------------------------------------------
     
@@ -167,20 +141,20 @@ public class ActorController : MonoBehaviour
     {
         // 计算角色朝向
         bodyTargetDirection = Vector3.zero;
-        if (moveInput.y > 0)
+        if (pi.moveVec.y > 0)
         {
             bodyTargetDirection += cameraStraightForward;
         }
-        else if (moveInput.y < 0)
+        else if (pi.moveVec.y < 0)
         {
             bodyTargetDirection += -cameraStraightForward;
         }
         
-        if (moveInput.x > 0)
+        if (pi.moveVec.x > 0)
         {
             bodyTargetDirection += cameraStraightRight;
         }
-        else if (moveInput.x < 0)
+        else if (pi.moveVec.x < 0)
         {
             bodyTargetDirection += -cameraStraightRight;
         }
@@ -209,7 +183,7 @@ public class ActorController : MonoBehaviour
 
     private void MovePlayerForward()
     {
-        targetSpeed = leftShiftInput ? runSpeed : walkSpeed;
+        targetSpeed = pi.leftShift ? runSpeed : walkSpeed;
         
         if (curSpeed < targetSpeed)
         {
@@ -276,7 +250,7 @@ public class ActorController : MonoBehaviour
 
     private void Jump()
     {
-        if (inputManager.playerControls.Locomotion.Jump.triggered)
+        if (pi.jump)
         {
             isOnGround = false;
             playerRigidbody.drag = airDrag;
