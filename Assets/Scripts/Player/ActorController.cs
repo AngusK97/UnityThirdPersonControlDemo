@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerMovement : MonoBehaviour
+public class ActorController : MonoBehaviour
 {
     [Header("Direction Calculation")]
     public Vector3 cameraStraightForward;
@@ -31,7 +31,7 @@ public class PlayerMovement : MonoBehaviour
     public float airDrag = 0f;
 
     [Header("Ground Detection")]
-    public bool isGrounded;
+    public bool isOnGround;
     public bool isOnSlop;
     public float playerHeight = 2f;
     public float groundDistance = 0.4f;
@@ -50,12 +50,12 @@ public class PlayerMovement : MonoBehaviour
     public string speedParamString;
     public string jumpParamString;
     public string isGroundedParamString;
-    public string isAttackingParamString;
+    public string attackParamString;
     
     private int _speedParamHash;
     private int _jumpParamHash;
     private int _isGroundedParamHash;
-    private int _isAttackingParamHash;
+    private int _attackParamHash;
     private bool _isAttacking;
 
     private Transform _transform;
@@ -74,7 +74,7 @@ public class PlayerMovement : MonoBehaviour
         _speedParamHash = Animator.StringToHash(speedParamString);
         _jumpParamHash = Animator.StringToHash(jumpParamString);
         _isGroundedParamHash = Animator.StringToHash(isGroundedParamString);
-        _isAttackingParamHash = Animator.StringToHash(isAttackingParamString);
+        _attackParamHash = Animator.StringToHash(attackParamString);
         
         inputManager.playerControls.Locomotion.Movement.performed += ReadMovementInput;
         inputManager.playerControls.Locomotion.LeftShift.started += SetLeftShiftPressed;
@@ -90,17 +90,18 @@ public class PlayerMovement : MonoBehaviour
         Debug.DrawRay(position, cameraStraightRight * 10, Color.red);
         Debug.DrawRay(position, cameraStraightForward * 10, Color.blue);
 
-        isGrounded = CheckIsGrounded();
+        isOnGround = CheckIsGrounded();
         isOnSlop = CheckIsOnSlop();
         
-        if (isGrounded || isOnSlop)
+        if (inputManager.playerControls.Attack.LightAttack.triggered && isOnGround)
+            animator.SetTrigger(_attackParamHash);
+        
+        if (isOnGround || isOnSlop)
         {
             playerRigidbody.drag = landDrag;
             
             animator.SetBool(_isGroundedParamHash, true);
             
-            _isAttacking = animator.GetBool(_isAttackingParamHash);
-
             if (!_isAttacking)
             {
                 if (moveInput.magnitude != 0)
@@ -117,14 +118,14 @@ public class PlayerMovement : MonoBehaviour
                         animator.SetFloat(_speedParamHash, curSpeed);
                     }
                 }
+                
+                Jump();
             }
             else
             {
                 RotateAttackingPlayerBody();
                 MoveAttackingPlayerForward();
             }
-
-            Jump();
         }
         else
         {
@@ -135,11 +136,6 @@ public class PlayerMovement : MonoBehaviour
         UpdateLookPointPosition();
 
         velocity = playerRigidbody.velocity;
-    }
-
-    private void LateUpdate()
-    {
-        animator.ResetTrigger(_jumpParamHash);
     }
 
 
@@ -282,7 +278,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if (inputManager.playerControls.Locomotion.Jump.triggered)
         {
-            isGrounded = false;
+            isOnGround = false;
             playerRigidbody.drag = airDrag;
 
             var curVelocity = playerRigidbody.velocity;
@@ -353,5 +349,20 @@ public class PlayerMovement : MonoBehaviour
         var curPointPosition = lookPoint.position;
         var nextPointPosition = Vector3.Slerp(curPointPosition, finalPointPosition, 0.05f);
         lookPoint.position = nextPointPosition;
+    }
+    
+    
+    //-----------------------------------------------------------------------------------------------
+    // Message processing block
+    //-----------------------------------------------------------------------------------------------
+
+    private void OnAttackIdleEnter()
+    {
+        _isAttacking = false;
+    }
+
+    private void OnAttackIdleExit()
+    {
+        _isAttacking = true;
     }
 }

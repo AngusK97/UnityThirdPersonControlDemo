@@ -9,9 +9,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5531848017826213731}
-  - component: {fileID: 5531848017826213728}
-  - component: {fileID: 5531848017826213729}
   - component: {fileID: 5531848017826213726}
+  - component: {fileID: 5531848017826213729}
+  - component: {fileID: 5531848017826213728}
   - component: {fileID: 5531848017826213727}
   m_Layer: 0
   m_Name: Fighter
@@ -36,6 +36,36 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!54 &5531848017826213726
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5531848017826213724}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 1
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 1
+  m_Constraints: 112
+  m_CollisionDetection: 0
+--- !u!136 &5531848017826213729
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5531848017826213724}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.26
+  m_Height: 2
+  m_Direction: 1
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &5531848017826213728
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -73,43 +103,14 @@ MonoBehaviour:
   groundMask:
     serializedVersion: 2
     m_Bits: 256
+  head: {fileID: 2099585609678920480}
+  lookPoint: {fileID: 5531848019284946028}
+  lookPointDistance: 5
+  inputManager: {fileID: 0}
   animator: {fileID: 5531848017826213727}
   speedParamString: speed
   jumpParamString: jump
   isGroundedParamString: isGrounded
-  head: {fileID: 2099585609678920480}
-  lookPoint: {fileID: 5531848019284946028}
-  lookPointDistance: 5
---- !u!136 &5531848017826213729
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5531848017826213724}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  m_Radius: 0.26
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!54 &5531848017826213726
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5531848017826213724}
-  serializedVersion: 2
-  m_Mass: 1
-  m_Drag: 1
-  m_AngularDrag: 0.05
-  m_UseGravity: 1
-  m_IsKinematic: 0
-  m_Interpolate: 1
-  m_Constraints: 112
-  m_CollisionDetection: 0
 --- !u!95 &5531848017826213727
 Animator:
   serializedVersion: 3
