@@ -4,6 +4,10 @@ using UnityEngine.InputSystem;
 
 public class ActorController : MonoBehaviour
 {
+    public Animator anim;
+    public Transform model;
+    public PlayerInput pi;
+
     [Header("Direction Calculation")]
     public Vector3 cameraStraightForward;
     public Vector3 cameraStraightRight;
@@ -20,7 +24,7 @@ public class ActorController : MonoBehaviour
     public Vector3 velocity;
     
     [Header("Jump")]
-    public Rigidbody playerRigidbody;
+    public Rigidbody rigid;
     public float jumpForce = 7f;
     public Vector3 upForce;
 
@@ -40,22 +44,17 @@ public class ActorController : MonoBehaviour
     public Transform lookPoint;
     public float lookPointDistance = 5f;
 
-    [Header("Player Input")]
-    public PlayerInput pi;
-
-    [Header("Animation")]
-    public Animator animator;
-    public string speedParam;
-    public string jumpParam;
-    public string isOnGroundedParam;
-    public string attackParam;
-    
+    [Header("Anim Params")]
+    [SerializeField] private string speedParam;
+    [SerializeField] private string jumpParam;
+    [SerializeField] private string isOnGroundedParam;
+    [SerializeField] private string attackParam;
     private int _speedParamHash;
     private int _jumpParamHash;
     private int _isGroundedParamHash;
     private int _attackParamHash;
+    
     private bool _isAttacking;
-
     private Transform _transform;
     private Transform _mainCameraTransform;
 
@@ -88,13 +87,13 @@ public class ActorController : MonoBehaviour
         isOnSlop = CheckIsOnSlop();
         
         if (pi.attack && isOnGround)
-            animator.SetTrigger(_attackParamHash);
+            anim.SetTrigger(_attackParamHash);
         
         if (isOnGround || isOnSlop)
         {
-            playerRigidbody.drag = landDrag;
+            rigid.drag = landDrag;
             
-            animator.SetBool(_isGroundedParamHash, true);
+            anim.SetBool(_isGroundedParamHash, true);
             
             if (!_isAttacking)
             {
@@ -109,7 +108,7 @@ public class ActorController : MonoBehaviour
                     {
                         curSpeed -= deceleration * Time.fixedDeltaTime;
                         curSpeed = Mathf.Clamp(curSpeed, 0, float.MaxValue);
-                        animator.SetFloat(_speedParamHash, curSpeed);
+                        anim.SetFloat(_speedParamHash, curSpeed);
                     }
                 }
                 
@@ -123,13 +122,13 @@ public class ActorController : MonoBehaviour
         }
         else
         {
-            playerRigidbody.drag = airDrag;
-            animator.SetBool(_isGroundedParamHash, false);
+            rigid.drag = airDrag;
+            anim.SetBool(_isGroundedParamHash, false);
         }
         
         UpdateLookPointPosition();
 
-        velocity = playerRigidbody.velocity;
+        velocity = rigid.velocity;
     }
 
 
@@ -196,9 +195,8 @@ public class ActorController : MonoBehaviour
             curSpeed = Mathf.Clamp(curSpeed, targetSpeed, float.MaxValue);
         }
         
-        animator.SetFloat(_speedParamHash, curSpeed);
-        playerRigidbody.velocity = _transform.forward * curSpeed 
-                                   + new Vector3(0f, playerRigidbody.velocity.y, 0f);
+        anim.SetFloat(_speedParamHash, curSpeed);
+        rigid.velocity = _transform.forward * curSpeed + new Vector3(0f, rigid.velocity.y, 0f);
     }
     
     private void RotateAttackingPlayerBody()
@@ -215,10 +213,7 @@ public class ActorController : MonoBehaviour
         // Unity 遵循左手螺旋定则，如果结果为正，说明相机方向在角色方向右边，使用正角度值进行旋转
         // 如果结果为负，说明相机方向在角色方向左边，使用负角度值进行旋转
         var crossProduct = Vector3.Cross(playerForward, bodyTargetDirection).y;
-        if (crossProduct < 0)
-        {
-            desiredRotationAngle *= -1;
-        }
+        if (crossProduct < 0) desiredRotationAngle *= -1;
         
         // 旋转角色
         var rotation = _transform.rotation;
@@ -243,9 +238,8 @@ public class ActorController : MonoBehaviour
             curSpeed = Mathf.Clamp(curSpeed, targetSpeed, float.MaxValue);
         }
         
-        animator.SetFloat(_speedParamHash, curSpeed);
-        playerRigidbody.velocity = _transform.forward * curSpeed 
-                                   + new Vector3(0f, playerRigidbody.velocity.y, 0f);
+        anim.SetFloat(_speedParamHash, curSpeed);
+        rigid.velocity = _transform.forward * curSpeed + new Vector3(0f, rigid.velocity.y, 0f);
     }
 
     private void Jump()
@@ -253,16 +247,16 @@ public class ActorController : MonoBehaviour
         if (pi.jump)
         {
             isOnGround = false;
-            playerRigidbody.drag = airDrag;
+            rigid.drag = airDrag;
 
-            var curVelocity = playerRigidbody.velocity;
-            playerRigidbody.velocity = new Vector3(curVelocity.x, 0f, curVelocity.z);
+            var curVelocity = rigid.velocity;
+            rigid.velocity = new Vector3(curVelocity.x, 0f, curVelocity.z);
             
             upForce = _transform.up * jumpForce;
-            playerRigidbody.AddForce(upForce, ForceMode.Impulse);
+            rigid.AddForce(upForce, ForceMode.Impulse);
             
-            animator.SetTrigger(_jumpParamHash);
-            animator.SetBool(_isGroundedParamHash, false);
+            anim.SetTrigger(_jumpParamHash);
+            anim.SetBool(_isGroundedParamHash, false);
         }
     }
 
@@ -287,9 +281,7 @@ public class ActorController : MonoBehaviour
             out var slopHit, playerHeight / 2 + 0.5f))
         {
             if (slopHit.normal != Vector3.up)
-            {
                 return true;
-            }
         }
         return false;
     }
@@ -301,8 +293,8 @@ public class ActorController : MonoBehaviour
 
     public void OnAnimatorIK(int layerIndex)
     {
-        animator.SetLookAtWeight(1, 0, 1, 0, 0.50f);
-        animator.SetLookAtPosition(lookPoint.position);
+        anim.SetLookAtWeight(1, 0, 1, 0, 0.50f);
+        anim.SetLookAtPosition(lookPoint.position);
     }
     
     private void UpdateLookPointPosition()
@@ -327,7 +319,7 @@ public class ActorController : MonoBehaviour
     
     
     //-----------------------------------------------------------------------------------------------
-    // Message processing block
+    // Anim message processing block
     //-----------------------------------------------------------------------------------------------
 
     private void OnAttackIdleEnter()

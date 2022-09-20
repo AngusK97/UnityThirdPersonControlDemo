@@ -1576,6 +1576,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e1f199d4fb4947c88a76c2b26746a48, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  anim: {fileID: 643414998}
+  model: {fileID: 643414997}
+  pi: {fileID: 644610787}
   cameraStraightForward: {x: 0, y: 0, z: 0}
   cameraStraightRight: {x: 0, y: 0, z: 0}
   bodyTargetDirection: {x: 0, y: 0, z: 0}
@@ -1587,7 +1590,7 @@ MonoBehaviour:
   targetSpeed: 0
   curSpeed: 0
   velocity: {x: 0, y: 0, z: 0}
-  playerRigidbody: {fileID: 644610783}
+  rigid: {fileID: 644610783}
   jumpForce: 18
   upForce: {x: 0, y: 0, z: 0}
   landDrag: 1
@@ -1602,8 +1605,6 @@ MonoBehaviour:
   head: {fileID: 2012787273}
   lookPoint: {fileID: 1601993197}
   lookPointDistance: 5
-  pi: {fileID: 644610787}
-  animator: {fileID: 643414998}
   speedParam: speed
   jumpParam: jump
   isOnGroundedParam: isOnGround
@@ -2895,7 +2896,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
-  m_LocalRotation: {x: 0.05038708, y: 0.000000017322982, z: -8.7349533e-10, w: 0.99872977}
+  m_LocalRotation: {x: 0.05038708, y: 0.000000017319838, z: -8.73651e-10, w: 0.99872977}
   m_LocalPosition: {x: 0, y: 2.15, z: -3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
@@ -5312,7 +5313,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2112175068}
-  m_LocalRotation: {x: 0.1820081, y: -0.000000014652268, z: 0.000000002712132, w: 0.98329705}
+  m_LocalRotation: {x: 0.18200809, y: -1.6873456e-15, z: 3.0380017e-16, w: 0.98329705}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:

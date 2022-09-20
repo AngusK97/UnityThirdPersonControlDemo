@@ -3,46 +3,41 @@ using UnityEngine.InputSystem;
 
 public class PlayerInput : MonoBehaviour
 {
-    public PlayerControls playerControls;
-    
     public Vector2 moveVec;
     public bool leftShift;
     public bool attack;
     public bool jump;
     
+    private PlayerControls _playerControls;
+    
     private void Awake()
     {
-        playerControls = new PlayerControls();
+        _playerControls = new PlayerControls();
+    }
+    
+    private void OnEnable()
+    {
+        _playerControls.Enable();
     }
 
     private void Start()
     {
-        playerControls.Locomotion.Movement.performed += ReadMovementInput;
-        playerControls.Locomotion.LeftShift.started += SetLeftShiftPressed;
-        playerControls.Locomotion.LeftShift.canceled += SetLeftShiftUnpressed;
+        _playerControls.Locomotion.Movement.performed += ReadMovementInput;
+        _playerControls.Locomotion.LeftShift.started += SetLeftShiftPressed;
+        _playerControls.Locomotion.LeftShift.canceled += SetLeftShiftUnpressed;
     }
 
     private void Update()
     {
-        attack = playerControls.Attack.LightAttack.triggered;
-        jump = playerControls.Locomotion.Jump.triggered;
-    }
-
-    private void OnEnable()
-    {
-        playerControls.Enable();
+        attack = _playerControls.Attack.LightAttack.triggered;
+        jump = _playerControls.Locomotion.Jump.triggered;
     }
 
     private void OnDisable()
     {
-        playerControls.Disable();
+        _playerControls.Disable();
     }
 
-    
-    //-----------------------------------------------------------------------------------------------
-    // Read Input System Data
-    //-----------------------------------------------------------------------------------------------
-    
     private void ReadMovementInput(InputAction.CallbackContext ctx)
     {
         moveVec = ctx.ReadValue<Vector2>();
