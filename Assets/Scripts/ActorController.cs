@@ -11,17 +11,15 @@ public class ActorController : MonoBehaviour
     [Header("Direction Calculation")]
     public Vector3 cameraStraightForward;
     public Vector3 cameraStraightRight;
-    public Vector3 bodyTargetDirection;
     
     [Header("Move")]
     public float walkSpeed = 5f;
     public float runSpeed = 10f;
+    public float attackMoveSpeed = 2f;
     public float rotateSpeed = 5f;
     public float acceleration = 0.05f;
     public float deceleration = 0.1f;
-    public float targetSpeed;
     public float curSpeed;
-    public Vector3 velocity;
     
     [Header("Jump")]
     public Rigidbody rigid;
@@ -51,7 +49,7 @@ public class ActorController : MonoBehaviour
     [SerializeField] private string attackParam;
     private int _speedParamHash;
     private int _jumpParamHash;
-    private int _isGroundedParamHash;
+    private int _isOnGroundParamHash;
     private int _attackParamHash;
     
     private bool _isAttacking;
@@ -70,7 +68,7 @@ public class ActorController : MonoBehaviour
         _mainCameraTransform = Camera.main.transform;
         _speedParamHash = Animator.StringToHash(speedParam);
         _jumpParamHash = Animator.StringToHash(jumpParam);
-        _isGroundedParamHash = Animator.StringToHash(isOnGroundedParam);
+        _isOnGroundParamHash = Animator.StringToHash(isOnGroundedParam);
         _attackParamHash = Animator.StringToHash(attackParam);
     }
 
@@ -92,18 +90,24 @@ public class ActorController : MonoBehaviour
         if (isOnGround || isOnSlop)
         {
             rigid.drag = landDrag;
-            
-            anim.SetBool(_isGroundedParamHash, true);
+            anim.SetBool(_isOnGroundParamHash, true);
             
             if (!_isAttacking)
             {
                 if (pi.moveVec.magnitude > 0.1f)
                 {
-                    RotatePlayerBody();
-                    MovePlayerForward();
+                    // rotate and move
+                    var targetDirection = Vector3.zero;
+                    if (pi.moveVec.y > 0) targetDirection += cameraStraightForward;
+                    else if (pi.moveVec.y < 0) targetDirection += -cameraStraightForward;
+                    if (pi.moveVec.x > 0) targetDirection += cameraStraightRight;
+                    else if (pi.moveVec.x < 0) targetDirection += -cameraStraightRight;
+                    RotatePlayerBody(targetDirection.normalized);
+                    MovePlayerForward(pi.leftShift ? runSpeed : walkSpeed);
                 }
                 else
                 {
+                    // decelerate current speed
                     if (curSpeed > 0)
                     {
                         curSpeed -= deceleration * Time.fixedDeltaTime;
@@ -112,23 +116,23 @@ public class ActorController : MonoBehaviour
                     }
                 }
                 
-                Jump();
+                if (pi.jump)
+                    Jump();
             }
             else
             {
-                RotateAttackingPlayerBody();
-                MoveAttackingPlayerForward();
+                // rotate and move
+                RotatePlayerBody(cameraStraightForward.normalized);
+                MovePlayerForward(attackMoveSpeed);
             }
         }
         else
         {
             rigid.drag = airDrag;
-            anim.SetBool(_isGroundedParamHash, false);
+            anim.SetBool(_isOnGroundParamHash, false);
         }
         
         UpdateLookPointPosition();
-
-        velocity = rigid.velocity;
     }
 
 
@@ -136,91 +140,25 @@ public class ActorController : MonoBehaviour
     // Locomotion
     //-----------------------------------------------------------------------------------------------
     
-    private void RotatePlayerBody()
+    private void RotatePlayerBody(Vector3 targetDirection)
     {
-        // 计算角色朝向
-        bodyTargetDirection = Vector3.zero;
-        if (pi.moveVec.y > 0)
-        {
-            bodyTargetDirection += cameraStraightForward;
-        }
-        else if (pi.moveVec.y < 0)
-        {
-            bodyTargetDirection += -cameraStraightForward;
-        }
-        
-        if (pi.moveVec.x > 0)
-        {
-            bodyTargetDirection += cameraStraightRight;
-        }
-        else if (pi.moveVec.x < 0)
-        {
-            bodyTargetDirection += -cameraStraightRight;
-        }
-        bodyTargetDirection.Normalize();
-        
         // 计算目标方向与角色前方方向的夹角度数
         var playerForward = _transform.forward;
-        var desiredRotationAngle = Vector3.Angle(playerForward, bodyTargetDirection);
+        var desiredRotationAngle = Vector3.Angle(playerForward, targetDirection);
 
         // 使用叉乘，查看相机水平方向在角色当前正前方方向的左边还是右边
         // Unity 遵循左手螺旋定则，如果结果为正，说明相机方向在角色右边，使用正角度值进行旋转
         // 如果结果为负，说明相机方向在角色左边，使用负角度值进行旋转
-        var crossProduct = Vector3.Cross(playerForward, bodyTargetDirection).y;
-        desiredRotationAngle *= crossProduct < 0 ? -1 : 1;
+        var crossProduct = Vector3.Cross(playerForward, targetDirection).y;
+        if (crossProduct < 0) desiredRotationAngle *= -1;
         
         var oldEuler = _transform.eulerAngles;
         var targetEuler = oldEuler + new Vector3(0, desiredRotationAngle);
         _transform.eulerAngles = Vector3.Lerp(oldEuler, targetEuler, Time.deltaTime * rotateSpeed);
     }
 
-    private void MovePlayerForward()
+    private void MovePlayerForward(float targetSpeed)
     {
-        targetSpeed = pi.leftShift ? runSpeed : walkSpeed;
-        
-        if (curSpeed < targetSpeed)
-        {
-            curSpeed += acceleration * Time.fixedDeltaTime;
-            curSpeed = Mathf.Clamp(curSpeed, 0, targetSpeed);
-        }
-        else if (curSpeed > targetSpeed)
-        {
-            curSpeed -= deceleration * Time.fixedDeltaTime;
-            curSpeed = Mathf.Clamp(curSpeed, targetSpeed, float.MaxValue);
-        }
-        
-        anim.SetFloat(_speedParamHash, curSpeed);
-        rigid.velocity = _transform.forward * curSpeed + new Vector3(0f, rigid.velocity.y, 0f);
-    }
-    
-    private void RotateAttackingPlayerBody()
-    {
-        // 计算角色朝向
-        bodyTargetDirection = cameraStraightForward;
-        bodyTargetDirection.Normalize();
-        
-        // 计算目标方向与角色前方方向的夹角度数
-        var playerForward = _transform.forward;
-        var desiredRotationAngle = Vector3.Angle(playerForward, bodyTargetDirection);
-
-        // 使用叉乘，查看相机水平方向在角色当前正前方方向的左边还是右边
-        // Unity 遵循左手螺旋定则，如果结果为正，说明相机方向在角色方向右边，使用正角度值进行旋转
-        // 如果结果为负，说明相机方向在角色方向左边，使用负角度值进行旋转
-        var crossProduct = Vector3.Cross(playerForward, bodyTargetDirection).y;
-        if (crossProduct < 0) desiredRotationAngle *= -1;
-        
-        // 旋转角色
-        var rotation = _transform.rotation;
-        var newEulerRotation = rotation.eulerAngles + new Vector3(0, desiredRotationAngle);
-        var newQuaternionRotation = Quaternion.Euler(newEulerRotation);
-        rotation = Quaternion.Slerp(rotation, newQuaternionRotation, Time.deltaTime * rotateSpeed);
-        _transform.rotation = rotation;
-    }
-
-    private void MoveAttackingPlayerForward()
-    {
-        targetSpeed = 2f;
-        
         if (curSpeed < targetSpeed)
         {
             curSpeed += acceleration * Time.fixedDeltaTime;
@@ -238,20 +176,17 @@ public class ActorController : MonoBehaviour
 
     private void Jump()
     {
-        if (pi.jump)
-        {
-            isOnGround = false;
-            rigid.drag = airDrag;
+        isOnGround = false;
+        rigid.drag = airDrag;
 
-            var curVelocity = rigid.velocity;
-            rigid.velocity = new Vector3(curVelocity.x, 0f, curVelocity.z);
-            
-            upForce = _transform.up * jumpForce;
-            rigid.AddForce(upForce, ForceMode.Impulse);
-            
-            anim.SetTrigger(_jumpParamHash);
-            anim.SetBool(_isGroundedParamHash, false);
-        }
+        var curVelocity = rigid.velocity;
+        rigid.velocity = new Vector3(curVelocity.x, 0f, curVelocity.z);
+
+        upForce = _transform.up * jumpForce;
+        rigid.AddForce(upForce, ForceMode.Impulse);
+
+        anim.SetTrigger(_jumpParamHash);
+        anim.SetBool(_isOnGroundParamHash, false);
     }
 
 
