@@ -1458,42 +1458,26 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 598613570}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &643414996 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 9a3171ee1bc004743bef89b2f1cffc37,
+    type: 3}
+  m_PrefabInstance: {fileID: 910588873}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &643414997 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 9a3171ee1bc004743bef89b2f1cffc37,
     type: 3}
   m_PrefabInstance: {fileID: 910588873}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &644610781
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 644610786}
-  - component: {fileID: 644610783}
-  - component: {fileID: 644610784}
-  - component: {fileID: 644610785}
-  - component: {fileID: 644610782}
-  - component: {fileID: 644610787}
-  - component: {fileID: 644610789}
-  m_Layer: 0
-  m_Name: Fighter
-  m_TagString: Player
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!95 &644610782
+--- !u!95 &643414998
 Animator:
   serializedVersion: 3
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 644610781}
+  m_GameObject: {fileID: 643414996}
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: 9a3171ee1bc004743bef89b2f1cffc37, type: 3}
   m_Controller: {fileID: 9100000, guid: d975b4856e16b494fb2627d2a71fafb3, type: 2}
@@ -1505,6 +1489,51 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &643414999
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 643414996}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0faa3411cf100504c9a40c2a29679f0c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &643415000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 643414996}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c41c06bca4a22a2448c7edacecf03ed9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  actorController: {fileID: 644610785}
+--- !u!1 &644610781
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 644610786}
+  - component: {fileID: 644610783}
+  - component: {fileID: 644610784}
+  - component: {fileID: 644610787}
+  - component: {fileID: 644610785}
+  m_Layer: 0
+  m_Name: PlayerHandle
+  m_TagString: Player
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
 --- !u!54 &644610783
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1576,11 +1605,11 @@ MonoBehaviour:
   lookPoint: {fileID: 1601993197}
   lookPointDistance: 5
   inputManager: {fileID: 644610787}
-  animator: {fileID: 644610782}
-  speedParamString: speed
-  jumpParamString: jump
-  isGroundedParamString: isGrounded
-  attackParamString: attack
+  animator: {fileID: 643414998}
+  speedParam: speed
+  jumpParam: jump
+  isOnGroundedParam: isOnGround
+  attackParam: attack
 --- !u!4 &644610786
 Transform:
   m_ObjectHideFlags: 0
@@ -1607,18 +1636,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5c2219c127c1c43db89db071dd93fa85, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &644610789
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 644610781}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0faa3411cf100504c9a40c2a29679f0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &653841076
@@ -2608,7 +2625,7 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 9a3171ee1bc004743bef89b2f1cffc37,
         type: 3}
       propertyPath: m_Name
-      value: Sword And Shield Idle
+      value: Model
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 5866666021909216657, guid: 9a3171ee1bc004743bef89b2f1cffc37, type: 3}
@@ -2876,7 +2893,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
-  m_LocalRotation: {x: 0.05038708, y: 0.000000017319838, z: -8.73651e-10, w: 0.99872977}
+  m_LocalRotation: {x: 0.05038708, y: 0.000000017322982, z: -8.734886e-10, w: 0.99872977}
   m_LocalPosition: {x: 0, y: 2.15, z: -3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
@@ -5293,7 +5310,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2112175068}
-  m_LocalRotation: {x: 0.18200809, y: 1.6873456e-15, z: -3.0380017e-16, w: 0.98329705}
+  m_LocalRotation: {x: 0.1820081, y: 0.00000001465227, z: -0.0000000027121323, w: 0.98329705}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:

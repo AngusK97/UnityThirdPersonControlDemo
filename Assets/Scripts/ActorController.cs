@@ -47,10 +47,10 @@ public class ActorController : MonoBehaviour
 
     [Header("Animation")]
     public Animator animator;
-    public string speedParamString;
-    public string jumpParamString;
-    public string isGroundedParamString;
-    public string attackParamString;
+    public string speedParam;
+    public string jumpParam;
+    public string isOnGroundedParam;
+    public string attackParam;
     
     private int _speedParamHash;
     private int _jumpParamHash;
@@ -71,10 +71,10 @@ public class ActorController : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         _transform = transform;
         _mainCameraTransform = Camera.main.transform;
-        _speedParamHash = Animator.StringToHash(speedParamString);
-        _jumpParamHash = Animator.StringToHash(jumpParamString);
-        _isGroundedParamHash = Animator.StringToHash(isGroundedParamString);
-        _attackParamHash = Animator.StringToHash(attackParamString);
+        _speedParamHash = Animator.StringToHash(speedParam);
+        _jumpParamHash = Animator.StringToHash(jumpParam);
+        _isGroundedParamHash = Animator.StringToHash(isOnGroundedParam);
+        _attackParamHash = Animator.StringToHash(attackParam);
         
         inputManager.playerControls.Locomotion.Movement.performed += ReadMovementInput;
         inputManager.playerControls.Locomotion.LeftShift.started += SetLeftShiftPressed;
@@ -325,7 +325,7 @@ public class ActorController : MonoBehaviour
     // Head Movement
     //-----------------------------------------------------------------------------------------------
 
-    private void OnAnimatorIK(int layerIndex)
+    public void OnAnimatorIK(int layerIndex)
     {
         animator.SetLookAtWeight(1, 0, 1, 0, 0.50f);
         animator.SetLookAtPosition(lookPoint.position);
