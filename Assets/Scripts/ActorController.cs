@@ -79,9 +79,9 @@ public class ActorController : MonoBehaviour
         // 计算相机水平正前方向、水平正右方向
         cameraStraightForward = Vector3.Scale(_mainCameraTransform.forward, new Vector3(1, 0, 1));
         cameraStraightRight = Vector3.Scale(_mainCameraTransform.right, new Vector3(1, 0, 1));
-        var position = _mainCameraTransform.position;
-        Debug.DrawRay(position, cameraStraightRight * 10, Color.red);
-        Debug.DrawRay(position, cameraStraightForward * 10, Color.blue);
+        // var position = _mainCameraTransform.position;
+        // Debug.DrawRay(position, cameraStraightRight * 10, Color.red);
+        // Debug.DrawRay(position, cameraStraightForward * 10, Color.blue);
 
         isOnGround = CheckIsGrounded();
         isOnSlop = CheckIsOnSlop();
@@ -97,7 +97,7 @@ public class ActorController : MonoBehaviour
             
             if (!_isAttacking)
             {
-                if (pi.moveVec.magnitude != 0)
+                if (pi.moveVec.magnitude > 0.1f)
                 {
                     RotatePlayerBody();
                     MovePlayerForward();
@@ -164,20 +164,14 @@ public class ActorController : MonoBehaviour
         var desiredRotationAngle = Vector3.Angle(playerForward, bodyTargetDirection);
 
         // 使用叉乘，查看相机水平方向在角色当前正前方方向的左边还是右边
-        // Unity 遵循左手螺旋定则，如果结果为正，说明相机方向在角色方向右边，使用正角度值进行旋转
-        // 如果结果为负，说明相机方向在角色方向左边，使用负角度值进行旋转
+        // Unity 遵循左手螺旋定则，如果结果为正，说明相机方向在角色右边，使用正角度值进行旋转
+        // 如果结果为负，说明相机方向在角色左边，使用负角度值进行旋转
         var crossProduct = Vector3.Cross(playerForward, bodyTargetDirection).y;
-        if (crossProduct < 0)
-        {
-            desiredRotationAngle *= -1;
-        }
+        desiredRotationAngle *= crossProduct < 0 ? -1 : 1;
         
-        // 旋转角色
-        var rotation = _transform.rotation;
-        var newEulerRotation = rotation.eulerAngles + new Vector3(0, desiredRotationAngle);
-        var newQuaternionRotation = Quaternion.Euler(newEulerRotation);
-        rotation = Quaternion.Slerp(rotation, newQuaternionRotation, Time.deltaTime * rotateSpeed);
-        _transform.rotation = rotation;
+        var oldEuler = _transform.eulerAngles;
+        var targetEuler = oldEuler + new Vector3(0, desiredRotationAngle);
+        _transform.eulerAngles = Vector3.Lerp(oldEuler, targetEuler, Time.deltaTime * rotateSpeed);
     }
 
     private void MovePlayerForward()
